@@ -32,6 +32,13 @@ Route::get('/dashboard', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/charts', function () {
+    return Inertia::render('Charts', [
+        'weatherData' => Data::getData()->Data(),
+        'dataOptions' => Data::getData()->Options(),
+    ]);
+})->middleware(['auth', 'verified'])->name('charts');
+
 
 // demo data;
 Route::get('/data', function() {

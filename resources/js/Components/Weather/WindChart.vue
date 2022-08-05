@@ -1,9 +1,9 @@
 <script setup>
 import moment from 'moment';
-import { computed } from "vue";
+
 import AppSelect from '@/Components/Select.vue';
 import { usePage } from "@inertiajs/inertia-vue3";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const dateIndex = ref(0);
 
@@ -12,10 +12,6 @@ const dates = ref([10, 11, 12, 13, 14, 15, 16, 17, 18])
 const data = computed(() => usePage().props.value.weatherData);
 
 const options = computed(() => usePage().props.value.dataOptions);
-
-const windLabels = data.value.map((hour) => {
-    return hour.time;
-});
 
 
 const _selectedOptions = ref([]);
