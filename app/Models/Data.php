@@ -56,7 +56,7 @@ class Data
             $line = [];
             foreach ($row_split as $item_index => $item) {
                 if (isset($headers[$item_index]))
-                    $line[$headers[$item_index]] = $item;
+                    $line[$headers[$item_index]] = trim($item);
             }
             $line = collect($line);
 
@@ -71,7 +71,7 @@ class Data
         foreach ($row as $header) {
 
             $header = explode('[', $header)[0]; // don't judge me.
-            $headers[] = strtolower($header);
+            $headers[] = trim(strtolower($header));
         }
 
         return $headers;
