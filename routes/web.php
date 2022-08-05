@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Data;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,7 +26,15 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Dashboard', [
+        'weatherData' => Data::getData()->Data()
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+
+// demo data;
+Route::get('/data', function() {
+    return response()->json(Data::getData()->Data());
+});
 
 require __DIR__.'/auth.php';
