@@ -1,12 +1,12 @@
 <script setup>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue';
-import WindChart from '@/Components/Weather/WindChart.vue'
 import { Head } from '@inertiajs/inertia-vue3';
+import LineChart from '@/Components/Weather/LineChart.vue';
 </script>
 
 <template>
 
-    <Head title="Dashboard" />
+    <Head title="Chart View" />
 
     <BreezeAuthenticatedLayout>
         <template #header>
@@ -20,7 +20,7 @@ import { Head } from '@inertiajs/inertia-vue3';
                 <div class="bg-white  shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <!-- Charts go here  -->
-                        <WindChart />
+                        <LineChart />
                     </div>
                 </div>
             </div>
