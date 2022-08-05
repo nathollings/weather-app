@@ -71,7 +71,6 @@ class Data
             if ($optionsValues) {
                 $line = self::parseOptions($row);
                 if(!!$line) {
-                    $line = collect($line);
                     $options->push($line);
                 }
                 continue;
@@ -128,15 +127,14 @@ class Data
      */
     public static function parseOptions($row)
     {
-        $options = [];
+        $option = null;
         $item = explode(':', $row);
         if(count($item) == 2) {
-            $options[] = [
+            $option = [
                 'code' => trim(strtolower($item[0])),
                 'option' => trim(strtolower($item[1])),
             ];
-            return $options;
         }
-        return null;
+        return $option;
     }
 }

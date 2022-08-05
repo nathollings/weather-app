@@ -1,6 +1,7 @@
 <script setup>
 import moment from 'moment';
 import { computed } from "vue";
+import AppSelect from '@/Components/Select.vue';
 import { usePage } from "@inertiajs/inertia-vue3";
 import { onMounted, ref } from "vue";
 
@@ -9,26 +10,42 @@ const dateIndex = ref(0);
 const dates = ref([10, 11, 12, 13, 14, 15, 16, 17, 18])
 
 const data = computed(() => usePage().props.value.weatherData);
+
+const options = computed(() => usePage().props.value.dataOptions);
+
 const windLabels = data.value.map((hour) => {
     return hour.time;
 });
 
-const windData = data.value
-    .filter(row => {
-        console.log(row.time.slice(8, 10));
-        return row.time.slice(8, 10) == dates.value[dateIndex.value];
-    })
-    .map((hour) => {
 
-        return {
-            time: moment(hour.time).format("ddd, hA"),
-            wd: hour.wd.value + hour.wd.unit,
-            wsp: hour.wsp.value + hour.wsp.unit,
-            gst: hour.gst.value + hour.gst.unit,
-            vis: hour.vis.value + hour.vis.unit,
-        };
-    });
+const _selectedOptions = ref([]);
 
+const selectedOptions = computed({
+    set: (_value) => {
+        _selectedOptions.push(value)
+    },
+
+    get: () => {
+        return _selectedOptions.value;
+    }
+})
+
+
+const windData = computed(() => {
+    return data.value
+        .map(row => {
+            return {
+                formattedTime: moment(row.time).format("ddd, hA"),
+                localTime: moment(row.time).format(),
+                localTimeFormatted: moment(row.time).format('dddd Do MMMM YYYY'),
+                ...row
+            }
+        })
+        .filter(row => {
+            console.log(row.localTime.slice(8, 10));
+            return row.localTime.slice(8, 10) == dates.value[dateIndex.value];
+        });
+})
 
 const bumpUp = () => {
     if ((dateIndex.value.length + 1) > dates.value.length) {
@@ -44,34 +61,66 @@ const bumpDown = () => {
     dateIndex.value -= 1;
 }
 
+onMounted(() => {
+    const defaultOptions = [
+        'wd',
+        'wsp',
+        'gst',
+        'vis',
+    ];
+
+    options.value.forEach(option => {
+        if (defaultOptions.includes(option.code)) {
+            selectedOptions.value.push(option);
+        }
+    });
+})
+
 
 
 </script>
 
 <template>
 
-    <button
-        :disabled="dateIndex < 1"
-        :class="{ 'opacity-50': dateIndex < 1 }"
-        class="m-2 px-4 py-2 font-semibold text-sm bg-sky-500 text-white rounded-none shadow-sm"
-        @click="bumpDown()"
-    >Prev</button>
-    <button
-        :disabled="dateIndex >= dates.length"
-        :class="{ 'opacity-50': dateIndex >= dates.length }"
-        class="m-2 px-4 py-2 font-semibold text-sm bg-sky-500 text-white rounded-none shadow-sm"
-        @click="bumpUp()"
-    >Next</button>
+    <div class="grid grid-cols-3 gap-4 content-center">
+        <button
+            :disabled="dateIndex < 1"
+            :class="{ 'opacity-50': dateIndex < 1 }"
+            class="m-2 px-4 py-2 font-semibold text-sm bg-sky-500 text-white rounded-none shadow-sm"
+            @click="bumpDown()"
+        >Prev</button>
+
+        <span
+            v-if="windData && windData[0]"
+            class="m-2 px-4 py-2 font-semibold text-sm shadow-sm text-center"
+        >
+            {{ windData[0].localTimeFormatted }}
+        </span>
+
+        <button
+            :disabled="dateIndex + 1 >= dates.length"
+            :class="{ 'opacity-50': dateIndex + 1 >= dates.length }"
+            class="m-2 px-4 py-2 font-semibold text-sm bg-sky-500 text-white rounded-none shadow-sm"
+            @click="bumpUp()"
+        >Next</button>
+
+    </div>
+
+    <AppSelect
+        :options="options"
+        :value="selectedOptions"
+        @input="selectedOptions"
+    ></AppSelect>
 
 
-    <table class="border-separate border-spacing-4 border border-slate-500">
+    <table class="border-separate border-spacing-4 border min-w-full border-sky-200">
         <thead>
             <tr>
-                <th class="px-2">Date Time</th>
-                <th class="px-2">Wind Direction</th>
-                <th class="px-2">Wind Speed</th>
-                <th class="px-2">Typical Gust Speed</th>
-                <th class="px-2">Visibility</th>
+                <th class="w-32">Time</th>
+                <th
+                    v-for="option in selectedOptions"
+                    :key="option.code"
+                >{{ option.option }}</th>
             </tr>
         </thead>
         <tbody>
@@ -79,11 +128,16 @@ const bumpDown = () => {
                 v-for="row in windData"
                 :key="row.time"
             >
-                <td>{{ row.time }}</td>
-                <td>{{ row.wd }}</td>
-                <td>{{ row.wsp }}</td>
-                <td>{{ row.gst }}</td>
-                <td>{{ row.vis }}</td>
+                <td>{{ row.formattedTime }}</td>
+                <td
+                    v-for="option in selectedOptions"
+                    :key="`data_row_${option.code}`"
+                    class="text-right"
+                >
+
+                    {{ row[option.code].value }}{{ row[option.code].unit || '' }}
+
+                </td>
             </tr>
         </tbody>
     </table>
