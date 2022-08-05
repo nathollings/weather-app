@@ -9,14 +9,22 @@ class Data
 
     protected $data;
 
-    public function __construct($data)
+    protected $options;
+
+    public function __construct($data, $options)
     {
         $this->data = $data;
+        $this->options = $options;
     }
 
     public function Data()
     {
         return $this->data;
+    }
+
+    public function Options()
+    {
+        return $this->options;
     }
 
 
@@ -30,6 +38,9 @@ class Data
 
         $file = Http::get(config('weather.source'));
 
+        // trigged when we get to end of file.
+        $optionsValues = false;
+
         $contents = $file->body();
 
         // split by new line... trim to remove tricky whitespace.
@@ -39,41 +50,93 @@ class Data
 
 
         $headers = [];
+        $options = collect([]);
 
         foreach ($rows as $index => $row) {
             $row_split = preg_split('/\t+/', $row);
-            if($index == 0) {
+            if ($index == 0) {
                 $headers = self::parseHeaders($row_split);
                 continue;
             }
 
-            if($row[0] == '>') {
-                break;
+            if (isset($row[0]) && $row[0] == '>') {
+                $optionsValues = true;
+                continue;
             }
 
             // actual data here.
 
             $line = [];
+
+            if ($optionsValues) {
+                $line = self::parseOptions($row);
+                if(!!$line) {
+                    $line = collect($line);
+                    $options->push($line);
+                }
+                continue;
+            }
+
+
             foreach ($row_split as $item_index => $item) {
                 if (isset($headers[$item_index]))
-                    $line[$headers[$item_index]] = trim($item);
+
+                    if ($headers[$item_index]['header'] == 'time') {
+
+                        $line[$headers[$item_index]['header']] = \Carbon\Carbon::parse(trim($item));
+                    } else {
+
+                        $line[$headers[$item_index]['header']] = [
+                            'value' => trim($item),
+                            'unit' => $headers[$item_index]['unit']
+                        ];
+                    }
             }
             $line = collect($line);
 
             $data->push($line);
         }
 
-        return new Data($data);
+        return new Data($data, $options);
     }
 
+    /**
+     * parse data headers
+     *
+     * @param [array] $row
+     * @return array string[]
+     */
     public static function parseHeaders($row)
     {
         foreach ($row as $header) {
 
-            $header = explode('[', $header)[0]; // don't judge me.
-            $headers[] = trim(strtolower($header));
+            $header = explode('[', $header); // don't judge me.
+            $headers[] = [
+                'header' => trim(strtolower($header[0])),
+                'unit' => str_replace(']', '', trim(strtolower($header[1]))),
+            ];
         }
 
         return $headers;
+    }
+
+    /**
+     * Parse Options
+     *
+     * @param [array] $row
+     * @return array string[]
+     */
+    public static function parseOptions($row)
+    {
+        $options = [];
+        $item = explode(':', $row);
+        if(count($item) == 2) {
+            $options[] = [
+                'code' => trim(strtolower($item[0])),
+                'option' => trim(strtolower($item[1])),
+            ];
+            return $options;
+        }
+        return null;
     }
 }

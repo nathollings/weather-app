@@ -27,7 +27,8 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
-        'weatherData' => Data::getData()->Data()
+        'weatherData' => Data::getData()->Data(),
+        'dataOptions' => Data::getData()->Options(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -35,6 +36,10 @@ Route::get('/dashboard', function () {
 // demo data;
 Route::get('/data', function() {
     return response()->json(Data::getData()->Data());
+});
+// demo data;
+Route::get('/options', function() {
+    return response()->json(Data::getData()->Options());
 });
 
 require __DIR__.'/auth.php';
