@@ -183,6 +183,7 @@ const updateChart = async () => {
             :options="options"
             :value="selectedOptions"
             @input="selectedOptions; updateChart();"
+            placeholder="Select Options you wish to chart"
         ></AppSelect>
 
         <canvas

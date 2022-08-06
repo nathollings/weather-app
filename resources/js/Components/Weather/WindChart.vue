@@ -106,6 +106,7 @@ onMounted(() => {
         :options="options"
         :value="selectedOptions"
         @input="selectedOptions"
+        placeholder="Select Options you wish to review"
     ></AppSelect>
 
 

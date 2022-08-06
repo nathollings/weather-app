@@ -45,7 +45,8 @@
 
                             <div class="flex-1">
                                 <input
-                                    placeholder=""
+                                    disabled
+                                    :placeholder="placeholder"
                                     class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-full text-gray-800"
                                 >
                             </div>
@@ -67,7 +68,16 @@
                                     stroke-linejoin="round"
                                     class="feather feather-chevron-up w-4 h-4"
                                 >
-                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                    <path
+                                        v-if="isSelectOpen"
+                                        d="M6.1018 16.9814C5.02785 16.9814 4.45387 15.7165 5.16108 14.9083L10.6829 8.59762C11.3801 7.80079 12.6197 7.80079 13.3169 8.59762L18.8388 14.9083C19.5459 15.7165 18.972 16.9814 17.898 16.9814H6.1018Z"
+                                        class="text-sky-500"
+                                    />
+                                    <path
+                                        v-else
+                                        d="M6.1018 8C5.02785 8 4.45387 9.2649 5.16108 10.0731L10.6829 16.3838C11.3801 17.1806 12.6197 17.1806 13.3169 16.3838L18.8388 10.0731C19.5459 9.2649 18.972 8 17.898 8H6.1018Z"
+                                        class="text-sky-500"
+                                    />
                                 </svg>
                             </button>
                         </div>
@@ -109,7 +119,7 @@ export default {
             selectedOptions: this.value || [],
         }
     },
-    props: ['options', 'value'],
+    props: ['options', 'value', 'placeholder'],
     methods: {
         selectOption(option) {
             const optionIndex = this.selectedOptions.findIndex(el => el.code === option.code);
