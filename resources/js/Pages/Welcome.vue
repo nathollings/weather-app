@@ -30,9 +30,21 @@ defineProps({
                 width="300"
             >
 
-            <p class="text-sky-600 mb-3 text-2xl whitespace-normal">
+            <p
+                v-if="!$page.props.auth.user"
+                class="text-sky-600 mb-3 text-2xl whitespace-normal"
+            >
                 Register to check the weather from a
                 <span class="italic underline">single</span> week in 2014
+                <br>
+            </p>
+
+            <p
+                v-else
+                class="text-sky-600 mb-3 text-2xl whitespace-normal"
+            >
+                View your dashboard to plan your trip 😉 🚤.
+
             </p>
 
             <Link
@@ -59,6 +71,9 @@ defineProps({
                 Register
                 </Link>
             </template>
+            <p class="mt-16">
+                <small>P.S. I am loving this @InertiaJS/Laravel Breeze.</small>
+            </p>
         </div>
     </div>
 </template>
