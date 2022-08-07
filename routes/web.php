@@ -40,13 +40,4 @@ Route::get('/charts', function () {
 })->middleware(['auth', 'verified'])->name('charts');
 
 
-// demo data;
-Route::get('/data', function() {
-    return response()->json(Data::getData()->Data());
-});
-// demo data;
-Route::get('/options', function() {
-    return response()->json(Data::getData()->Options());
-});
-
 require __DIR__.'/auth.php';
